@@ -10,6 +10,8 @@ stimulation at the membrane and focal adhesions, with varying responses observed
 ordinary differential equations (ODEs) to simulate RhoA activity over time under these different conditions at each localisation. RhoA activity dynamics were found to be best modelled 
 by adding a negative feedback loop of RhoA on itself through GAPs activation as represented on the following figure:
 
+![Alt text](./model_schematics.svg)
+
 The parameters of the model were fitted using various optimization packages of the SciML ecosystem such as OrdinaryDiffEq.jl and Optimization.jl.
 
 Here are the key steps of code:
