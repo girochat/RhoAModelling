@@ -12,10 +12,11 @@ by adding a negative feedback loop of RhoA on itself through GAPs activation as 
 
 ![Alt text](./model_schematics.svg)
 
-The parameters of the model were fitted using various optimization packages of the SciML ecosystem such as OrdinaryDiffEq.jl and Optimization.jl.
+The parameters of the model were fitted using various optimization packages of the SciML ecosystem such as [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq/stable/) 
+and [Optimization.jl](https://docs.sciml.ai/Optimization/stable/).
 
 Here are the key steps of code:
-- Model Definition: The code defines the model using ModelingToolkit.jl, which allows for symbolic representation of the system of equations governing RhoA dynamics.
+- Model Definition: The code defines the model using [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/), which allows for symbolic representation of the system of equations governing RhoA dynamics.
 - Parameter Fitting: The model is fit to the experimental data to estimate the parameters governing RhoA activity in the presence and absence of DLC1.
   This is done using Optimization techniques in Julia.
 - Results Plotting: Visualisation of the results for different experimental conditions (e.g., wild type vs DLC1 knockout).
@@ -71,8 +72,15 @@ define the model, perform parameter fitting, and output the results.
 
     julia --project="." <script_name>
 
-The results will include a plot of the fitted dynamics for RhoA as well as the other model species. Example:
+The results will include a plot of the fitted dynamics for RhoA as well as the other model species.  
+Here is an example of the output for the results at the focal adhesions:  
 
+
+
+![Alt text](./FA_plot.svg)  
+
+  
+![Alt text](./FA_all_plot_sharex.svg)
 
 
 ### Citation
@@ -83,4 +91,4 @@ eLife 12:RP90305. DOI: https://doi.org/10.7554/eLife.90305.1
 
 ### License
 
-This repository is licensed under the MIT License. See the LICENSE file for more details.
+This repository is licensed under the MIT License. See the [LICENSE](./LICENSE.txt) for more details.
