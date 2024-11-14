@@ -10,7 +10,7 @@ stimulation at the membrane and focal adhesions, with varying responses observed
 ordinary differential equations (ODEs) to simulate RhoA activity over time under these different conditions at each localisation. RhoA activity dynamics were found to be best modelled 
 by adding a negative feedback loop of RhoA on itself through GAPs activation as represented on the following figure:
 
-![Alt text](./model_schematics.svg)
+![Alt text](./Plots/model_schematics.svg)
 
 The parameters of the model were fitted using various optimization packages of the SciML ecosystem such as [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq/stable/) 
 and [Optimization.jl](https://docs.sciml.ai/Optimization/stable/).
@@ -23,15 +23,14 @@ Here are the key steps of code:
 
 ### Repository Contents
 
-This repository contains:
+This repository contains three main directories:
 
-- Pluto Notebooks: Interactive notebook used for modeling RhoA dynamics, fitting the model to experimental data, and visualizing results.
-- Julia Scripts:
-  Script version of the Pluto notebooks.
-- Data Files:
-  Experimental data for RhoA activity under various conditions (presence or knock-out of DLC1). Source: Lucien Hinderling, Pertz Lab, Institute of Cell Biology, University of Bern.
-
-There is a notebook/script for each cellular localisation of the stimulation, i.e. at the membrane or at focal adhesions.
+- Code:  
+  Pluto/Jupyter notebooks that were used for modeling RhoA dynamics, fitting the model to experimental data, and visualizing the results. Also Julia scripts for parameter identifiability analysis. The Jupyter notebooks work with a Julia kernel and still require Julia to be installed alongside the package IJulia.jl. 
+- Data:  
+    Experimental data for RhoA activity under various conditions (presence or knock-out of DLC1). Source: Lucien Hinderling, Pertz Lab, Institute of Cell Biology, University of Bern.
+- Plots:  
+    Plots of the data fitting results at the membrane and focal adhesions.
 
 ### Installation
 
@@ -77,10 +76,10 @@ Here is an example of the output for the results at the focal adhesions:
 
 
 
-![Alt text](./FA_plot.svg)  
+![Alt text](./Plots/FA_plot_linear.svg)  
 
   
-![Alt text](./FA_all_plot_sharex.svg)
+![Alt text](./Plots/FA_all_plot_sharex_linear.svg)
 
 
 ### Citation
