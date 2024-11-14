@@ -193,6 +193,8 @@ callback! = function(parameters, loss)
 end
 
 # ╔═╡ e4389a99-b2e8-4938-843d-343f9dd3df5f
+# ╠═╡ disabled = true
+#=╠═╡
 begin 
 
 	# Clear the tracking arrays if not empty
@@ -203,8 +205,10 @@ begin
 	# Run the optimisation
 	optim_results = Optimization.solve(optimisation_prob, LBFGS(), callback = callback!, maxiters = 100, progress = true)
 end
+  ╠═╡ =#
 
 # ╔═╡ 16fc1498-503b-4447-9ea9-82879efdf3f8
+#=╠═╡
 begin
 	# Retrieve initial conditions from optimisation solution
 	pred_u0 = [0; 0; 1]
@@ -217,20 +221,25 @@ begin
 	scatter(timeframe[12:end], median_rhoa_NONFA[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in WT cells")
 	plot!(pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 476286e8-dd0d-4036-b3ab-e9f075ce8205
+#=╠═╡
 # Visualise optimisation statistics
 optim_results.original
+  ╠═╡ =#
 
 # ╔═╡ 2efefa13-fad1-4ad1-8265-32cf46ffddbb
 # Plot the loss value at each iteration
 plot(track_loss, title = "Evolution of the loss value", label = false)
 
 # ╔═╡ fab82aa4-a281-4bb9-8771-378cef7bf613
+#=╠═╡
 begin
 	# Plot the dynamics of all proteins
 	plot(pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 5948c768-4b3c-4bb2-b880-6723fafc9053
 md"""
@@ -337,6 +346,8 @@ KO_callback! = function(parameters, loss)
 end
 
 # ╔═╡ 13c1ea9b-9804-4f9c-8429-6c024284bf8e
+# ╠═╡ disabled = true
+#=╠═╡
 begin 
 	# Clear the tracking array if not empty
 	if !isempty(KO_track_loss)
@@ -346,8 +357,10 @@ begin
 	# Run the optimisation
 	KO_optim_results = Optimization.solve(KO_optimisation_prob, LBFGS(), callback = KO_callback!, maxiters = 100, progress = true)
 end
+  ╠═╡ =#
 
 # ╔═╡ c6bfd2a4-df9d-4f83-882d-d1bb1c1a3ecb
+#=╠═╡
 begin
 	# Retrieve initial conditions from optimisation solution
 	KO_pred_u0 = [0;0;1]
@@ -360,16 +373,21 @@ begin
 	scatter(timeframe[12:end], median_rhoa_NONFA_KO[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in DLC1-KO cells" )
 	plot!(KO_pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 09cce5a5-713d-445c-aadf-34f9a820be56
+#=╠═╡
 # Visualise optimisation statistics
 KO_optim_results.original
+  ╠═╡ =#
 
 # ╔═╡ ea8d3c39-e086-4db0-b50f-f1b64bc992cf
+#=╠═╡
 begin
 	# Plot the dynamics of all proteins
 	plot(KO_pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 0763ed96-04bb-43b3-8c40-fa58344ea96f
 md"""
@@ -396,17 +414,6 @@ end
 # ╔═╡ 4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
 begin
 	# Save best parameters
-	#saved_parameters = [0.0323253, 5.0, 1.22424, 0.0213587, 0.0213584, 5.0, 0.2448, 1.0]
-	#saved_parameters = [1.28385e-9, 4.08817, 0.28807, 0.045259, 0.0491, 3.84274, 0.0710608, 0.877017]
-	#saved_parameters = [2.51715e-22, 5.14643, 0.0526724, 10.0, 2.22239e-5, 4.87384, 0.389004, 3.86332e-15]
-	#saved_parameters = [0.0336366, 0.725186, 0.0300675, 0.0102179, 0.00439217, 4.82675, 1.00399, 1.00399] # no GAP/GEF steady states and deactivation of RhoA depends on unnormalised RhoA
-	#saved_parameters = [0.0298006, 0.0228549, 0.00293089, 0.0139713] # by setting 1 as max rate
-	#saved_parameters = [0.0452812, 2.22172e-22, 0.000153249, 1.10432] # with 0.2 as GEF0 and 0.12 as Kcatgef and 3 as max rate
-	#saved_parameters = [0.308185, 0.000165521, 9.41079] # with 0.2 as GEF0 and 0.12 as Kcatgef and 10 as max rate
-	#saved_parameters = [0.0250921, 0.00229808, 0.0147689] # with 0.2 as GEF0 and 0.1 as Kcatgef and 10 as max rate
-	saved_parameters = [0.155982, 0.00019739, 2.97246] # with 0.2 as GEF0 and 0.14 as Kcatgef and 3 as max rate
-	#saved_parameters = [0.0457636, 0.000155832, 1.06384] # with 0.2 as GEF0 and 0.12 as Kcatgef and 3 as max rate
-	#saved_parameters = [0.0301377, 0.107515, 0.00469657, 0.00869423] # with 0.2 as GEF0 and optim as Kcatgef and 3 as max rate
 	saved_parameters = [0.118373, 5.0, 0.00135633, 1.22779]
 	
 	# Transform back ODE parameters to their symbolic expression
@@ -430,12 +437,6 @@ saved_param
 # ╔═╡ d758e312-70d8-41e3-a1dc-cc6ce8a744db
 begin
 	# Save best parameters
-	#saved_KO_parameters = [0.0153623, 5.0, 3.34273, 0.0419158, 5.0, 0.320935, 0.999999] 
-	#saved_KO_parameters = [0.0142832, 0.938937, 3.0, 0.00409945] # with 3 as max rate, 0.94 as gef0 and 0.12 as kcatgef
-	#saved_KO_parameters = [0.014226, 10.0, 0.00225018] # with 10 as max rate, 0.2 as gef0 and 0.14 as kcatgef
-	#saved_KO_parameters = [0.0152448, 0.00487144, 0.0819561] # with 3 as max rate, 0.2 as gef0 and 0.14 as kcatgef
-	saved_KO_parameters = [0.016281, 3.0, 0.00312485] # with 3 as max rate, 0.2 as gef0 and 0.15 as kcatgef
-	#saved_KO_parameters = [1.30773, 3.0, 0.415258, 3.0] # with 3 as max rate, 0.2 as gef0 and optim as kcatgef
 	saved_KO_parameters = [0.0138277, 0.0315648, 5.0, 1.36068]
 
 	# Transform back ODE parameters to their symbolic expression
@@ -484,14 +485,14 @@ end
 # ╠═8277b2e6-6cf6-4f4a-ae4b-274548edb651
 # ╟─a97176f9-7dd2-4870-9a80-b91e25ba8b97
 # ╟─e44a2ff8-7326-4080-813e-ffbeb4c4b648
-# ╠═52bdbc46-53fc-42ca-8fec-e43522c30063
+# ╟─52bdbc46-53fc-42ca-8fec-e43522c30063
 # ╟─247533da-69ba-483c-8025-004c32a1bf9c
 # ╟─b05d3803-9883-4073-87a8-6324db7c207f
-# ╠═a20dcc69-c419-472d-8b93-836cde4a54e7
-# ╠═b7208c41-3f65-4f6a-ae06-e4426d6549a0
+# ╟─a20dcc69-c419-472d-8b93-836cde4a54e7
+# ╟─b7208c41-3f65-4f6a-ae06-e4426d6549a0
 # ╟─487b4ff4-3e29-48d0-bb6d-9d9ec048de1c
 # ╟─f025a699-1e30-478c-8160-4ea16005eac7
-# ╠═c654e848-5777-4443-87b4-58e48b353f01
+# ╟─c654e848-5777-4443-87b4-58e48b353f01
 # ╟─f6eef16c-6084-42ee-80ea-fc4165b78753
 # ╠═979b822d-cbc4-49b5-b2d4-8821fc664917
 # ╠═3fae1a20-4231-4758-a403-11e929d36a10

@@ -195,6 +195,8 @@ callback! = function(parameters, loss)
 end
 
 # ╔═╡ b2400664-474d-4a16-90e5-7c789576c2cd
+# ╠═╡ disabled = true
+#=╠═╡
 begin 
 
 	# Clear the tracking array if not empty
@@ -205,8 +207,10 @@ begin
 	# Run the optimisation
 	optim_results = Optimization.solve(optimisation_prob, LBFGS(), callback = callback!, maxiters = 100, progress = true)
 end
+  ╠═╡ =#
 
 # ╔═╡ f31fa805-d0f8-4f04-abaf-d17e0483350e
+#=╠═╡
 begin
 	# Define initial conditions
 	pred_u0 = [0; 0; 1]
@@ -221,17 +225,22 @@ begin
 	scatter(timeframe[12:end], median_rhoa_FA[12:end], label = "Data", lw=2, title = "FA RhoA dynamics in WT cells")
 	plot!(pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 619564f9-fafd-4750-bc5d-95d3c234e4b1
+#=╠═╡
 # Visualise optimisation statistics
 optim_results.original
+  ╠═╡ =#
 
 # ╔═╡ ffbfc081-1ed0-4402-9174-cfbef1bb9fb3
 # Plot the loss value at each iteration
 plot(track_loss, title = "Evolution of the loss value", label = false)
 
 # ╔═╡ 21f8b5e7-056e-4ea6-abc5-d23d7c8bddfe
+#=╠═╡
 plot(pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
+  ╠═╡ =#
 
 # ╔═╡ 91954a15-bf7c-40cf-a485-1db4bcae08cc
 md"""
@@ -337,6 +346,8 @@ KO_callback! = function(parameters, loss)
 end
 
 # ╔═╡ 38a5bd18-9074-4830-b8e0-9e74e1650547
+# ╠═╡ disabled = true
+#=╠═╡
 begin 
 	# Clear the tracking array if not empty
 	if length(KO_track_loss) > 0
@@ -346,8 +357,10 @@ begin
 	# Run the optimisation
 	KO_optim_results = Optimization.solve(KO_optimisation_prob, LBFGS(), callback = KO_callback!, maxiters = 100, progress = true)
 end
+  ╠═╡ =#
 
 # ╔═╡ 9fcdd6d4-5d71-4f4f-809a-09d76e34a09f
+#=╠═╡
 begin
 	# Retrieve initial conditions from optimisation solution
 	KO_predicted_u0 = [0;0;1]
@@ -362,16 +375,21 @@ begin
 	plot!(KO_pred_sol, label = "Prediction", lw=2, idxs=3)
 
 end
+  ╠═╡ =#
 
 # ╔═╡ 5b4ccf8e-e412-45eb-8823-b8fefdaaf2d9
+#=╠═╡
 KO_optim_results.original
+  ╠═╡ =#
 
 # ╔═╡ e8b4cb6f-8b04-49f1-8423-ab5479bf8e0a
 # Plot the loss value at each iteration
 plot(KO_track_loss, title = "Evolution of the loss value", label = false)
 
 # ╔═╡ 8fda161f-4c5d-44cb-9e78-789495a6d0b1
+#=╠═╡
 plot(KO_pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
+  ╠═╡ =#
 
 # ╔═╡ af2bb913-c1a6-489f-b5ae-3cece876e089
 md"""
@@ -398,18 +416,7 @@ end
 # ╔═╡ ceea52cf-7b52-44a1-af60-127c0eb76bde
 begin
 	# Save best parameters
-	#saved_FA_parameters = [0.0283273, 4.99966, 1.2623, 0.0518214, 0.00602064, 5.0021, 0.251038, 1.00089] 
-	#saved_FA_parameters = [0.0256483, 0.159698, 0.14181, 0.028302, 0.000938847]
-	#saved_FA_parameters = [0.154525, 0.254087, 0.254119, 10.0, 0.00200114]
-	#saved_FA_parameters = [0.39659, 5.32868, 4.7683, 0.00013859, 9.99956] # with 0.2 for gef0 and 0.14 for kcatgef
-	#saved_FA_parameters = [0.0307839, 1.43336, 1.50376, 0.00246482, 0.0135322] # with 0.2 for gef0 and 0.12 for kcatgef
-	#saved_FA_parameters = [0.0257328, 0.113305, 0.225656, 0.000117745] # with 0.2 for gef0 and optim for kcatgef
-	saved_parameters = [0.163902, 2.99997, 0.000156601] # with 0.2 for gef0 and 0.14 for kcatgef and 3 as max rate
-	saved_parameters = [0.0257348, 0.000105676, 0.251443, 0.113307] # with 0.2 for gef0 and optim for kcatgef and 5 as max rate and 10 as total amount 
-	saved_parameters = [0.165441, 5.0, 0.00123041, 1.28402] # with 0.2 for gef0 and optim for kcatgef and 5 as max rate and 1 as total amount (2 for rho)
-	#saved_parameters = [0.0242824, 0.00012452, 2.0, 1.07322]
-	# with 0.2 for gef0 and optim for kcatgef and 2 as max rate and 1 as total amount (2 for rho)
-	#saved_parameters = [0.0242807, 0.0001, 2.49029, 1.07318] # with 0.2 for gef0 and optim for kcatgef and 3 as max rate and 1 as total amount (2 for rho)
+	saved_parameters = [0.165441, 5.0, 0.00123041, 1.28402]
 
 	# Transform back ODE parameters to their symbolic expression
 	saved_param = [
@@ -433,17 +440,6 @@ saved_param
 # ╔═╡ f5877b34-cefe-4653-acd1-7ae9344e7d4f
 begin
 	# Save best parameters
-	#saved_FA_KO_parameters = [0.014498, 5.0, 3.34117, 0.0349393, 5.0, 0.30211, 0.999999] 
-	#saved_FA_KO_parameters = [0.0200323, 0.155727, 0.192988, 0.147544, 0.00207496]
-	#saved_FA_KO_parameters = [0.0119047, 5.11431, 4.87277, 0.11328, 0.0142759]
-	#saved_FA_KO_parameters = [0.0151485, 4.3408, 6.27711, 4.34998, 0.00219892] # with 0.14 for kcatgef and 0.2 for gef0
-	#saved_FA_KO_parameters = [0.0151341, 10.0, 0.00144988] # with 0.14 for kcatgef and 0.2 for gef0 and max rate 10
-	#saved_FA_KO_parameters = [0.0148817, 0.138016, 0.0341745, 0.0251796] # with optim for kcatgef and 0.2 for gef0 and max rate 3
-	#saved_FA_KO_parameters = [0.0151291, 0.465461, 0.00674001] # with 0.14 for kcatgef and 0.2 for gef0 and max rate 3
-	saved_KO_parameters = [0.016, 3, 0.0027] # with 0.15 as kcatgef and 3 as max rate
-	#saved_FA_KO_parameters = [0.016, 2.5, 0.003] # with 0.15 as kcatgef and 3 as max rate
-	#saved_FA_KO_parameters = [1.5, 0.223439, 0.0097101]
-	saved_KO_parameters = [1.99464, 0.00328464, 4.0, 0.143119]
 	saved_KO_parameters = [0.0129794, 0.0261144, 5.0, 1.3195]
 
 	# Transform back ODE parameters to their symbolic expression
