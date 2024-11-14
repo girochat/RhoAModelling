@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.40
+# v0.20.3
 
 using Markdown
 using InteractiveUtils
@@ -16,7 +16,7 @@ using DelimitedFiles
 # ╔═╡ a97176f9-7dd2-4870-9a80-b91e25ba8b97
 md"""
 ## Data fitting of membrane RhoA activation/deactivation dynamics
-This notebook contains the code used to fit an ODE model to the RhoA dynamics data obtained after local light stimulation at the membrane as described in the paper by Heydasch et al.  \
+This notebook contains the code used to fit an ODE model to the experimental data of RhoA activity obtained after local light stimulation at focal adhesions as described in the paper by Heydasch et al. \
 
 
 Max Heydasch, Lucien Hinderling, Jakobus van Unen, Maciej Dobrzynski, Olivier Pertz
@@ -25,7 +25,7 @@ Max Heydasch, Lucien Hinderling, Jakobus van Unen, Maciej Dobrzynski, Olivier Pe
 eLife 12:RP90305 \
 https://doi.org/10.7554/eLife.90305.1  
 
-Data source: Lucien Hinderling, PertzLab
+Data source: Lucien Hinderling, Pertz Lab, Institute of Cell Biology, University of Bern, Switzerland.
 """
 
 # ╔═╡ e44a2ff8-7326-4080-813e-ffbeb4c4b648
@@ -149,101 +149,6 @@ begin
 		(150.0, 400.0), parameter_guess[1:6], jac = true)
 end
 
-# ╔═╡ 476286e8-dd0d-4036-b3ab-e9f075ce8205
-#=╠═╡
-# Visualise optimisation statistics
-optim_results.original
-  ╠═╡ =#
-
-# ╔═╡ 5948c768-4b3c-4bb2-b880-6723fafc9053
-md"""
-#### 2: membrane and DLC1-KO cells
-"""
-
-# ╔═╡ df9db3fd-2e86-496a-afc5-f27887cdda12
-# Define RhoA negative autoregulation model for membrane and DLC1-KO cells
-@mtkmodel RhoA_KO_dynamics begin
-	
-	@parameters begin
-		# Share GEF parameters between the two conditions
-		#Kinact_GEF = 0.038 (value obtained from WT data fitting)
-		#Kcat_aGEF = 3.36 (value obtained from WT data fitting)
-		#Km_aGEF = 10 (value obtained from WT data fitting)
-		
-		Kcat_FL
-		#Km_FL # = 0 (value obtained from WT data fitting)
-
-		Kinact_GAP
-		Kcat_aGAP
-		#Km_aGAP # = 0 (value obtained from WT data fitting)
-
-		GEF0
-		GAP0
-
-	end
-	
-	@variables begin
-		aGEF(t), [bounds = (0, 10)]
-		aGAP(t), [bounds = (0, 10)]
-		aRhoA(t), [bounds = (0, 10)]
-		S(t)
-	end
-	
-	@equations begin
-
-		# Define linear model
-		D(aGEF) ~ 0.034 * (GEF0 * S - aGEF)
-		D(aGAP) ~ Kcat_FL * ((aRhoA-1)^2 * (tanh(100 * (aRhoA-1))-tanh(100*(aRhoA-10)))/2) + Kinact_GAP * (GAP0 - aGAP)
-		D(aRhoA) ~ 1.22 * (aGEF-GEF0) * (10 - aRhoA)/(5 + (10 - aRhoA)) - Kcat_aGAP * (aGAP-GAP0)^2
-		S ~ f_tanh(t)
-		
-		#=D(aGEF) ~ 0.034 * (GEF0 * S - aGEF)
-		D(aGAP) ~ Kcat_FL * ((10 - aGAP) * (aRhoA-1)^2 * (tanh(100 * (aRhoA-1))-tanh(100*(aRhoA-10)))/2)/(Km_FL + (10 - aGAP)) + Kinact_GAP * (GAP0 - aGAP)
-		D(aRhoA) ~ 1.22 * (aGEF-GEF0) * (10 - aRhoA)/(5 + (10 - aRhoA)) - Kcat_aGAP * (aGAP-GAP0)^2 * aRhoA/(Km_aGAP + aRhoA)
-		S ~ f_tanh(t)=#
-		
-	end
-end
-
-# ╔═╡ b6f6741b-53cf-4e24-8017-dac404d0a04d
-@mtkbuild RhoA_KO_model = RhoA_KO_dynamics()
-
-# ╔═╡ fe32650c-3795-4c93-a04c-a3828241f85e
-begin
-
-	# Define some initial parameters for the ODE model
-	KO_parameter_guess = [0.1, 0.12, 0.13, 0.14, 0.15, 0.5, 0.5]
-	
-	# Build ODE problems with guess parameters and initial conditions
-	RhoA_KO_prob = ODEProblem(RhoA_KO_model, 
-		[RhoA_KO_model.aGEF => 0.5, 
-			RhoA_KO_model.aRhoA => 1.0, 
-			RhoA_KO_model.aGAP => 0.5], 
-		(150.0, 400.0), KO_parameter_guess[1:5], jac = true)
-end
-
-# ╔═╡ 0763ed96-04bb-43b3-8c40-fa58344ea96f
-md"""
-### Comparison between DLC1-KO and WT data fitting
-"""
-
-# ╔═╡ f58afeb2-8704-4d1a-9f12-dd65ab05dc87
-""" 
-	get_idxparam(symbol::Symbol, prob::ODEProblem)
-
-Custom function to retrieve the index of the parameter in the optimisation solution array using its symbolic expression (symbol). 
-"""
-function get_idxparam(symbol, prob)
-
-	mtk_p = prob.ps
-	mtk_p_array = prob.p.tunable[1]
-	for i in eachindex(mtk_p_array)
-		if mtk_p[symbol] == mtk_p_array[i]
-			return i
-		end
-	end
-end
-
 # ╔═╡ 3fae1a20-4231-4758-a403-11e929d36a10
 # Define MSE loss function to estimate parameters
 function MSE_loss(new_parameters)
@@ -314,10 +219,6 @@ begin
 	optim_results = Optimization.solve(optimisation_prob, LBFGS(), callback = callback!, maxiters = 100, progress = true)
 end
 
-# ╔═╡ 2efefa13-fad1-4ad1-8265-32cf46ffddbb
-# Plot the loss value at each iteration
-plot(track_loss, title = "Evolution of the loss value", label = false)
-
 # ╔═╡ 16fc1498-503b-4447-9ea9-82879efdf3f8
 begin
 	# Retrieve initial conditions from optimisation solution
@@ -335,6 +236,14 @@ begin
 	scatter(timeframe[12:end], median_rhoa_NONFA[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in WT cells")
 	plot!(pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
 end
+
+# ╔═╡ 476286e8-dd0d-4036-b3ab-e9f075ce8205
+# Visualise optimisation statistics
+optim_results.original
+
+# ╔═╡ 2efefa13-fad1-4ad1-8265-32cf46ffddbb
+# Plot the loss value at each iteration
+plot(track_loss, title = "Evolution of the loss value", label = false)
 
 # ╔═╡ fab82aa4-a281-4bb9-8771-378cef7bf613
 begin
@@ -370,6 +279,73 @@ end
 
 # ╔═╡ 50000f94-3949-4f4d-911d-019c4d1a3115
 saved_param
+
+# ╔═╡ 5948c768-4b3c-4bb2-b880-6723fafc9053
+md"""
+#### 2: membrane and DLC1-KO cells
+"""
+
+# ╔═╡ df9db3fd-2e86-496a-afc5-f27887cdda12
+# Define RhoA negative autoregulation model for membrane and DLC1-KO cells
+@mtkmodel RhoA_KO_dynamics begin
+	
+	@parameters begin
+		# Share GEF parameters between the two conditions
+		#Kinact_GEF = 0.038 (value obtained from WT data fitting)
+		#Kcat_aGEF = 3.36 (value obtained from WT data fitting)
+		#Km_aGEF = 10 (value obtained from WT data fitting)
+		
+		Kcat_FL
+		#Km_FL # = 0 (value obtained from WT data fitting)
+
+		Kinact_GAP
+		Kcat_aGAP
+		#Km_aGAP # = 0 (value obtained from WT data fitting)
+
+		GEF0
+		GAP0
+
+	end
+	
+	@variables begin
+		aGEF(t), [bounds = (0, 10)]
+		aGAP(t), [bounds = (0, 10)]
+		aRhoA(t), [bounds = (0, 10)]
+		S(t)
+	end
+	
+	@equations begin
+
+		# Define linear model
+		D(aGEF) ~ 0.034 * (GEF0 * S - aGEF)
+		D(aGAP) ~ Kcat_FL * ((aRhoA-1)^2 * (tanh(100 * (aRhoA-1))-tanh(100*(aRhoA-10)))/2) + Kinact_GAP * (GAP0 - aGAP)
+		D(aRhoA) ~ 1.22 * (aGEF-GEF0) * (10 - aRhoA)/(5 + (10 - aRhoA)) - Kcat_aGAP * (aGAP-GAP0)^2
+		S ~ f_tanh(t)
+		
+		#=D(aGEF) ~ 0.034 * (GEF0 * S - aGEF)
+		D(aGAP) ~ Kcat_FL * ((10 - aGAP) * (aRhoA-1)^2 * (tanh(100 * (aRhoA-1))-tanh(100*(aRhoA-10)))/2)/(Km_FL + (10 - aGAP)) + Kinact_GAP * (GAP0 - aGAP)
+		D(aRhoA) ~ 1.22 * (aGEF-GEF0) * (10 - aRhoA)/(5 + (10 - aRhoA)) - Kcat_aGAP * (aGAP-GAP0)^2 * aRhoA/(Km_aGAP + aRhoA)
+		S ~ f_tanh(t)=#
+		
+	end
+end
+
+# ╔═╡ b6f6741b-53cf-4e24-8017-dac404d0a04d
+@mtkbuild RhoA_KO_model = RhoA_KO_dynamics()
+
+# ╔═╡ fe32650c-3795-4c93-a04c-a3828241f85e
+begin
+
+	# Define some initial parameters for the ODE model
+	KO_parameter_guess = [0.1, 0.12, 0.13, 0.14, 0.15, 0.5, 0.5]
+	
+	# Build ODE problems with guess parameters and initial conditions
+	RhoA_KO_prob = ODEProblem(RhoA_KO_model, 
+		[RhoA_KO_model.aGEF => 0.5, 
+			RhoA_KO_model.aRhoA => 1.0, 
+			RhoA_KO_model.aGAP => 0.5], 
+		(150.0, 400.0), KO_parameter_guess[1:5], jac = true)
+end
 
 # ╔═╡ 89b95eca-fef6-43b9-bacc-401aabf075d4
 # Define MSE loss function to estimate parameters
@@ -440,10 +416,6 @@ begin
 	KO_optim_results = Optimization.solve(KO_optimisation_prob, LBFGS(), callback = KO_callback!, maxiters = 100, progress = true)
 end
 
-# ╔═╡ 09cce5a5-713d-445c-aadf-34f9a820be56
-# Visualise optimisation statistics
-KO_optim_results.original
-
 # ╔═╡ c6bfd2a4-df9d-4f83-882d-d1bb1c1a3ecb
 begin
 	# Retrieve initial conditions from optimisation solution
@@ -461,6 +433,10 @@ begin
 	scatter(timeframe[12:end], median_rhoa_NONFA_KO[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in DLC1-KO cells" )
 	plot!(KO_pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
 		end
+
+# ╔═╡ 09cce5a5-713d-445c-aadf-34f9a820be56
+# Visualise optimisation statistics
+KO_optim_results.original
 
 # ╔═╡ ea8d3c39-e086-4db0-b50f-f1b64bc992cf
 begin
@@ -493,6 +469,11 @@ end
 # ╔═╡ ee1b032c-e614-4251-90a7-4f50da3b61d1
 saved_KO_param
 
+# ╔═╡ 0763ed96-04bb-43b3-8c40-fa58344ea96f
+md"""
+### Comparison between DLC1-KO and WT data fitting
+"""
+
 # ╔═╡ 33ec1636-17f6-4e89-a42f-e368df94b965
 begin
 	# Plot results for each condition (WT and DLC1-KO)
@@ -515,6 +496,23 @@ begin
 	plot!(twinx(), saved_KO_pred_sol, title = "", idxs=2, linecolor="blue", linestyle=:dash, xlabel = "", legend=false, ylabel="relative [aGAP]")
 	plot(gef_plot, gef_plot_KO, layout=(2, 1), plot_title="Membrane aGEF and aGAP dynamics", plot_titlelocation=:left, plot_titlefontsize=14, )
 	#savefig("../Data/membrane_all_plot_sharex.svg")
+end
+
+# ╔═╡ f58afeb2-8704-4d1a-9f12-dd65ab05dc87
+""" 
+	get_idxparam(symbol::Symbol, prob::ODEProblem)
+
+Custom function to retrieve the index of the parameter in the optimisation solution array using its symbolic expression (symbol). 
+"""
+function get_idxparam(symbol, prob)
+
+	mtk_p = prob.ps
+	mtk_p_array = prob.p.tunable[1]
+	for i in eachindex(mtk_p_array)
+		if mtk_p[symbol] == mtk_p_array[i]
+			return i
+		end
+	end
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -3108,7 +3106,7 @@ version = "1.4.1+1"
 # ╔═╡ Cell order:
 # ╠═4c782b8a-dbc3-11ee-14a3-dfa170c15825
 # ╠═7f53f00a-f877-4dbb-901d-572d0bd6c54a
-# ╟─a97176f9-7dd2-4870-9a80-b91e25ba8b97
+# ╠═a97176f9-7dd2-4870-9a80-b91e25ba8b97
 # ╟─e44a2ff8-7326-4080-813e-ffbeb4c4b648
 # ╠═52bdbc46-53fc-42ca-8fec-e43522c30063
 # ╟─247533da-69ba-483c-8025-004c32a1bf9c
