@@ -64,21 +64,13 @@ Start the Pluto notebook in Julia:
 
 In the Pluto interface, open the desired notebook file to start exploring the model, adjust parameters, and visualize the results.
 
-#### Running the Julia Script
-
-If you prefer running the model via a script instead of the Pluto notebook, you can directly execute the Julia script version. This script will 
-define the model, perform parameter fitting, and output the results.
-
-    julia --project="." <script_name>
+If you prefer using Jupyter Notebook, the Jupyter version of the Pluto notebooks are also provided.
 
 The results will include a plot of the fitted dynamics for RhoA as well as the other model species.  
 Here is an example of the output for the results at the focal adhesions:  
 
-
-
 ![Alt text](./Plots/FA_plot_linear.svg)  
 
-  
 ![Alt text](./Plots/FA_all_plot_sharex_linear.svg)
 
 
