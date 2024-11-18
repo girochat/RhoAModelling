@@ -242,6 +242,30 @@ plot(track_loss, title = "Evolution of the loss value", label = false)
 plot(pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
   ╠═╡ =#
 
+# ╔═╡ ceea52cf-7b52-44a1-af60-127c0eb76bde
+begin
+	# Save best parameters
+	saved_parameters = [0.165441, 5.0, 0.00123041, 1.28402]
+
+	# Transform back ODE parameters to their symbolic expression
+	saved_param = [
+		Rho_model.Kon_GAP => saved_parameters[get_idxparam(Rho_model.Kon_GAP, Rho_prob)],
+		Rho_model.Koff_GAP => saved_parameters[get_idxparam(Rho_model.Koff_GAP, Rho_prob)],
+		Rho_model.Kon_Rho => saved_parameters[get_idxparam(Rho_model.Kon_Rho, Rho_prob)],
+		Rho_model.Koff_Rho => saved_parameters[get_idxparam(Rho_model.Koff_Rho, Rho_prob)]]
+	
+	saved_u0 = [0;0;1]
+
+	# Solve the ODE with the best parameters and plot
+	saved_pred_sol = solve(remake(Rho_prob, p=saved_param, u0=saved_u0), saveat=1, dtmax=0.05, tspan=(120, 400)) 
+	scatter(timeframe[12:40], median_rhoa_FA[12:40], label = "Data", lw=2, title = "FA RhoA dynamics in WT cells")
+	plot!(saved_pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
+	
+end
+
+# ╔═╡ 07cf038c-1032-4851-bdb1-9c17f290062b
+saved_param
+
 # ╔═╡ 91954a15-bf7c-40cf-a485-1db4bcae08cc
 md"""
 #### 2: focal adhesions and DLC1-KO cells
@@ -391,52 +415,6 @@ plot(KO_track_loss, title = "Evolution of the loss value", label = false)
 plot(KO_pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
   ╠═╡ =#
 
-# ╔═╡ af2bb913-c1a6-489f-b5ae-3cece876e089
-md"""
-### Comparison between DLC1-KO and WT data fitting
-"""
-
-# ╔═╡ da69d08a-701b-4fed-9643-42fcd4c11a2e
-""" 
-	get_idxparam(symbol::Symbol, prob::ODEProblem)
-
-Custom function to retrieve the index of the parameter in the optimisation solution array using its symbolic expression (symbol). 
-"""
-function get_idxparam(symbol, prob)
-
-	mtk_p = prob.ps
-	mtk_p_array = prob.p.tunable
-	for i in eachindex(mtk_p_array)
-		if mtk_p[symbol] == mtk_p_array[i]
-			return i
-		end
-	end
-end
-
-# ╔═╡ ceea52cf-7b52-44a1-af60-127c0eb76bde
-begin
-	# Save best parameters
-	saved_parameters = [0.165441, 5.0, 0.00123041, 1.28402]
-
-	# Transform back ODE parameters to their symbolic expression
-	saved_param = [
-		Rho_model.Kon_GAP => saved_parameters[get_idxparam(Rho_model.Kon_GAP, Rho_prob)],
-		Rho_model.Koff_GAP => saved_parameters[get_idxparam(Rho_model.Koff_GAP, Rho_prob)],
-		Rho_model.Kon_Rho => saved_parameters[get_idxparam(Rho_model.Kon_Rho, Rho_prob)],
-		Rho_model.Koff_Rho => saved_parameters[get_idxparam(Rho_model.Koff_Rho, Rho_prob)]]
-	
-	saved_u0 = [0;0;1]
-
-	# Solve the ODE with the best parameters and plot
-	saved_pred_sol = solve(remake(Rho_prob, p=saved_param, u0=saved_u0), saveat=1, dtmax=0.05, tspan=(120, 400)) 
-	scatter(timeframe[12:40], median_rhoa_FA[12:40], label = "Data", lw=2, title = "FA RhoA dynamics in WT cells")
-	plot!(saved_pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
-	
-end
-
-# ╔═╡ 07cf038c-1032-4851-bdb1-9c17f290062b
-saved_param
-
 # ╔═╡ f5877b34-cefe-4653-acd1-7ae9344e7d4f
 begin
 	# Save best parameters
@@ -460,6 +438,11 @@ end
 # ╔═╡ 837c314e-ea7b-4dab-8240-13da3a17d6e5
 saved_KO_param
 
+# ╔═╡ af2bb913-c1a6-489f-b5ae-3cece876e089
+md"""
+### Comparison between DLC1-KO and WT data fitting
+"""
+
 # ╔═╡ a4b2fb33-2b1c-4a8b-a8a7-69cedade9a6a
 begin
 	plot(saved_KO_pred_sol, lw=2, idxs=3, linecolor="#800080", label = "DLC1-KO (Prediction)", fontfamily="Arial")
@@ -481,6 +464,23 @@ begin
 	plot!(twinx(), saved_KO_pred_sol, title = "", idxs=2, linecolor="#800080", linestyle=:dash, xlabel = "", legend=false, ylabel="relative [aGAP]")
 	plot(gef_plot, gef_plot_KO, layout=(2, 1), plot_title="Focal Adhesions aGEF and aGAP dynamics", plot_titlelocation=:left, plot_titlefontsize=14, )
 	#savefig("../Data/FA_all_plot_sharex_linear.svg")
+end
+
+# ╔═╡ da69d08a-701b-4fed-9643-42fcd4c11a2e
+""" 
+	get_idxparam(symbol::Symbol, prob::ODEProblem)
+
+Custom function to retrieve the index of the parameter in the optimisation solution array using its symbolic expression (symbol). 
+"""
+function get_idxparam(symbol, prob)
+
+	mtk_p = prob.ps
+	mtk_p_array = prob.p.tunable
+	for i in eachindex(mtk_p_array)
+		if mtk_p[symbol] == mtk_p_array[i]
+			return i
+		end
+	end
 end
 
 # ╔═╡ Cell order:

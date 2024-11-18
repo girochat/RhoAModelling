@@ -241,6 +241,29 @@ begin
 end
   ╠═╡ =#
 
+# ╔═╡ 4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
+begin
+	# Save best parameters
+	saved_parameters = [0.118373, 5.0, 0.00135633, 1.22779]
+	
+	# Transform back ODE parameters to their symbolic expression
+	saved_param = [
+		Rho_model.Kon_GAP => saved_parameters[get_idxparam(Rho_model.Kon_GAP, Rho_prob)],
+		Rho_model.Koff_GAP => saved_parameters[get_idxparam(Rho_model.Koff_GAP, Rho_prob)],
+		Rho_model.Kon_Rho => saved_parameters[get_idxparam(Rho_model.Kon_Rho, Rho_prob)],
+		Rho_model.Koff_Rho => saved_parameters[get_idxparam(Rho_model.Koff_Rho, Rho_prob)]
+	]
+	saved_u0 = [0;0;1]
+
+	# Solve the ODE with the best parameters and plot
+	saved_pred_sol = solve(remake(Rho_prob, p=saved_param, u0=saved_u0, tspan=(120, 400)), saveat=1, dtmax=0.05) 
+	scatter(timeframe[12:end], median_rhoa_NONFA[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in WT cells")
+	plot!(saved_pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
+end
+
+# ╔═╡ 50000f94-3949-4f4d-911d-019c4d1a3115
+saved_param
+
 # ╔═╡ 5948c768-4b3c-4bb2-b880-6723fafc9053
 md"""
 #### 2: membrane and DLC1-KO cells
@@ -268,7 +291,7 @@ md"""
 
 		# Define linear model
 		D(GEF) ~ 0.034 * (0.2 * S - GEF)
-		D(GAP) ~ Kon_GAP * (1 - GAP) * (Rho-1)^2 - Koff_GAP * GAP
+		D(GAP) ~ Kon_GAP * (1 - GAP) * (Rho-1)^2 * ((tanh(100*(Rho-1))-tanh(100*(Rho-2)))/2) - Koff_GAP * GAP
 		D(Rho) ~ Kon_Rho * GEF * (2 - Rho) - Koff_Rho * (GAP)^2 * Rho
 		S ~ f_tanh(t)
 	end
@@ -389,51 +412,6 @@ begin
 end
   ╠═╡ =#
 
-# ╔═╡ 0763ed96-04bb-43b3-8c40-fa58344ea96f
-md"""
-### Comparison between DLC1-KO and WT data fitting
-"""
-
-# ╔═╡ f58afeb2-8704-4d1a-9f12-dd65ab05dc87
-""" 
-	get_idxparam(symbol::Symbol, prob::ODEProblem)
-
-Custom function to retrieve the index of the parameter in the optimisation solution array using its symbolic expression (symbol). 
-"""
-function get_idxparam(symbol, prob)
-
-	mtk_p = prob.ps
-	mtk_p_array = prob.p.tunable
-	for i in eachindex(mtk_p_array)
-		if mtk_p[symbol] == mtk_p_array[i]
-			return i
-		end
-	end
-end
-
-# ╔═╡ 4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
-begin
-	# Save best parameters
-	saved_parameters = [0.118373, 5.0, 0.00135633, 1.22779]
-	
-	# Transform back ODE parameters to their symbolic expression
-	saved_param = [
-		Rho_model.Kon_GAP => saved_parameters[get_idxparam(Rho_model.Kon_GAP, Rho_prob)],
-		Rho_model.Koff_GAP => saved_parameters[get_idxparam(Rho_model.Koff_GAP, Rho_prob)],
-		Rho_model.Kon_Rho => saved_parameters[get_idxparam(Rho_model.Kon_Rho, Rho_prob)],
-		Rho_model.Koff_Rho => saved_parameters[get_idxparam(Rho_model.Koff_Rho, Rho_prob)]
-	]
-	saved_u0 = [0;0;1]
-
-	# Solve the ODE with the best parameters and plot
-	saved_pred_sol = solve(remake(Rho_prob, p=saved_param, u0=saved_u0, tspan=(120, 400)), saveat=1, dtmax=0.05) 
-	scatter(timeframe[12:end], median_rhoa_NONFA[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in WT cells")
-	plot!(saved_pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
-end
-
-# ╔═╡ 50000f94-3949-4f4d-911d-019c4d1a3115
-saved_param
-
 # ╔═╡ d758e312-70d8-41e3-a1dc-cc6ce8a744db
 begin
 	# Save best parameters
@@ -456,6 +434,11 @@ end
 # ╔═╡ ee1b032c-e614-4251-90a7-4f50da3b61d1
 saved_KO_param
 
+# ╔═╡ 0763ed96-04bb-43b3-8c40-fa58344ea96f
+md"""
+### Comparison between DLC1-KO and WT data fitting
+"""
+
 # ╔═╡ 33ec1636-17f6-4e89-a42f-e368df94b965
 begin
 	# Plot results for each condition (WT and DLC1-KO)
@@ -465,7 +448,7 @@ begin
 	scatter!(timeframe[12:end], median_rhoa_NONFA[12:end], label = "WT (Data)", markercolor="#006400")
 	xlabel!("Time [s]")
 	ylabel!("Fold-change \nnormalised to baseline")
-	#savefig("../Data/membrane_plot_linear.svg")
+	#savefig("../Plots/membrane_plot_linear.svg")
 end
 
 # ╔═╡ 65562ef7-93eb-4d05-98fe-6689c26c4063
@@ -477,7 +460,24 @@ begin
 	plot!(timeframe[12:end], NaN.*timeframe[12:end], label = "aGAP", linestyle=:dash, linecolor="#800080")
 	plot!(twinx(), saved_KO_pred_sol, title = "", idxs=2, linecolor="#800080", linestyle=:dash, xlabel = "", legend=false, ylabel="relative [aGAP]")
 	plot(gef_plot, gef_plot_KO, layout=(2, 1), plot_title="Membrane aGEF and aGAP dynamics", plot_titlelocation=:left, plot_titlefontsize=14, )
-	#savefig("../Data/membrane_all_plot_linear.svg")
+	#savefig("../Plots/membrane_all_plot_linear.svg")
+end
+
+# ╔═╡ f58afeb2-8704-4d1a-9f12-dd65ab05dc87
+""" 
+	get_idxparam(symbol::Symbol, prob::ODEProblem)
+
+Custom function to retrieve the index of the parameter in the optimisation solution array using its symbolic expression (symbol). 
+"""
+function get_idxparam(symbol, prob)
+
+	mtk_p = prob.ps
+	mtk_p_array = prob.p.tunable
+	for i in eachindex(mtk_p_array)
+		if mtk_p[symbol] == mtk_p_array[i]
+			return i
+		end
+	end
 end
 
 # ╔═╡ Cell order:
