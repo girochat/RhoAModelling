@@ -42,12 +42,12 @@ in the Manifest.toml file.
 
 Clone this repository to your local machine.
 
-git clone https://github.com/your-username/rhoa-activity-modeling.git
+git clone https://github.com/girochat/RhoAModelling.git
 
 #### Install Dependencies
 For reproducibility, it is recommended to use the directory of the project as a Julia environment: 
 1. Go to the directory:  
-   `cd /your_path_to_the_repo/rhoa-activity-modeling`
+   `cd /your_path_to_the_repo/RhoAModelling`
 2. Open Julia and open the REPL by pressing ']'  
 3. In the REPL, activate the local environment and instantiate the packages:  
    `pkg> activate .`  
