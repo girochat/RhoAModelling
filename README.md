@@ -45,7 +45,7 @@ in the Manifest.toml file.
 
 Clone this repository to your local machine.
 
-git clone https://github.com/girochat/RhoAModelling.git
+  `git clone https://github.com/girochat/RhoAModelling.git`
 
 #### Install Dependencies
 For reproducibility, it is recommended to use the directory of the project as a Julia environment: 
