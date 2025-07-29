@@ -102,7 +102,7 @@ md"""
 	end
 	
 	@equations begin
-		D(GEF) ~ Kon * (10 - GEF) * Signal - Koff * GEF
+		D(GEF) ~ Kon * Signal - Koff * GEF
 		Signal ~ signal_tanh(t)
 	end
 end
@@ -196,7 +196,7 @@ end
 # ╔═╡ 238ea5ce-3e2b-45c6-bb9d-abb82fca9a0d
 begin
 	# Save parameters
-	saved_p = [0.00124615, 0.069705]
+	saved_p = [0.0123462, 0.0700499]
 
 	# Solve the ODE with the best parameters and plot
 	saved_pred_sol = solve(remake(prob, p=saved_p, tspan=(120, 400)), saveat=1, dtmax=0.05) 
