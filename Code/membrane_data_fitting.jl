@@ -116,7 +116,6 @@ md"""
 	end
 
 	@equations begin
-		#D(GEF) ~ 0.00124615 * (10 - GEF) * S - 0.069705 * GEF
 		D(GEF) ~ 0.0123462 * S - 0.0700499 * GEF
 		D(GAP) ~ Vmax_Rho * Rho / (Km_Rho + Rho) - (Koff_GAP * GAP)
 		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Vmax_GAP * GAP * Rho / (Km_GAP + Rho)
@@ -192,6 +191,8 @@ callback! = function(parameters, loss)
 end
 
 # ╔═╡ e4389a99-b2e8-4938-843d-343f9dd3df5f
+# ╠═╡ disabled = true
+#=╠═╡
 begin 
 
 	# Clear the tracking arrays if not empty
@@ -202,8 +203,10 @@ begin
 	# Run the optimisation
 	optim_results = Optimization.solve(optimisation_prob, LBFGS(), callback = callback!, maxiters = 100, progress = true)
 end
+  ╠═╡ =#
 
 # ╔═╡ 16fc1498-503b-4447-9ea9-82879efdf3f8
+#=╠═╡
 begin
 	
 	# Solve the ODE problem with optimal parameters
@@ -211,20 +214,25 @@ begin
 	scatter(timeframe[12:end], median_rhoa_NONFA[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in WT cells")
 	plot!(pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 476286e8-dd0d-4036-b3ab-e9f075ce8205
+#=╠═╡
 # Visualise optimisation statistics
 optim_results.original
+  ╠═╡ =#
 
 # ╔═╡ 2efefa13-fad1-4ad1-8265-32cf46ffddbb
 # Plot the loss value at each iteration
 plot(track_loss, title = "Evolution of the loss value", label = false)
 
 # ╔═╡ fab82aa4-a281-4bb9-8771-378cef7bf613
+#=╠═╡
 begin
 	# Plot the dynamics of all proteins
 	plot(pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
 begin
@@ -263,7 +271,6 @@ md"""
 	end
 	
 	@equations begin
-		#D(GEF) ~ 0.00124615 * (10 - GEF) * S - 0.069705 * GEF
 		D(GEF) ~ 0.0123462 * S - 0.0700499 * GEF
 		D(GAP) ~ Kon_GAP - (Koff_GAP * GAP)
 		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Vmax_GAP * GAP * Rho / (Km_GAP + Rho)
@@ -339,6 +346,8 @@ KO_callback! = function(parameters, loss)
 end
 
 # ╔═╡ 13c1ea9b-9804-4f9c-8429-6c024284bf8e
+# ╠═╡ disabled = true
+#=╠═╡
 begin 
 	# Clear the tracking array if not empty
 	if !isempty(KO_track_loss)
@@ -348,8 +357,10 @@ begin
 	# Run the optimisation
 	KO_optim_results = Optimization.solve(KO_optimisation_prob, LBFGS(), callback = KO_callback!, maxiters = 100, progress = true)
 end
+  ╠═╡ =#
 
 # ╔═╡ c6bfd2a4-df9d-4f83-882d-d1bb1c1a3ecb
+#=╠═╡
 begin
 	
 	# Solve and plot final solution
@@ -357,16 +368,21 @@ begin
 	scatter(timeframe[12:end], median_rhoa_NONFA_KO[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in DLC1-KO cells" )
 	plot!(KO_pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 09cce5a5-713d-445c-aadf-34f9a820be56
+#=╠═╡
 # Visualise optimisation statistics
 KO_optim_results.original
+  ╠═╡ =#
 
 # ╔═╡ ea8d3c39-e086-4db0-b50f-f1b64bc992cf
+#=╠═╡
 begin
 	# Plot the dynamics of all proteins
 	plot(KO_pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ d758e312-70d8-41e3-a1dc-cc6ce8a744db
 begin
@@ -470,7 +486,7 @@ end
 # ╟─3fae1a20-4231-4758-a403-11e929d36a10
 # ╟─4640701b-a251-46f0-b94c-b345b46e8ab1
 # ╟─5d479288-888c-4a32-8215-e5cf6b0713ca
-# ╟─e4389a99-b2e8-4938-843d-343f9dd3df5f
+# ╠═e4389a99-b2e8-4938-843d-343f9dd3df5f
 # ╟─16fc1498-503b-4447-9ea9-82879efdf3f8
 # ╟─476286e8-dd0d-4036-b3ab-e9f075ce8205
 # ╟─2efefa13-fad1-4ad1-8265-32cf46ffddbb
@@ -484,7 +500,7 @@ end
 # ╟─89b95eca-fef6-43b9-bacc-401aabf075d4
 # ╟─764df649-41df-417e-bfc9-19376333550d
 # ╟─1148d27b-d16a-41c7-9795-81331f1d32f0
-# ╟─13c1ea9b-9804-4f9c-8429-6c024284bf8e
+# ╠═13c1ea9b-9804-4f9c-8429-6c024284bf8e
 # ╟─c6bfd2a4-df9d-4f83-882d-d1bb1c1a3ecb
 # ╟─09cce5a5-713d-445c-aadf-34f9a820be56
 # ╟─ea8d3c39-e086-4db0-b50f-f1b64bc992cf

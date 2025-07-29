@@ -117,7 +117,6 @@ md"""
 	end
 	
 	@equations begin
-		#D(GEF) ~ 0.00124615 * (10 - GEF) * S - 0.069705 * GEF
 		D(GEF) ~ 0.0123462 * S - 0.0700499 * GEF
 		D(GAP) ~ Vmax_Rho * Rho / (Km_Rho + Rho) - Koff_GAP * GAP
 		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Vmax_GAP * GAP * Rho / (Km_GAP + Rho)
@@ -195,6 +194,8 @@ callback! = function(parameters, loss)
 end
 
 # ╔═╡ b2400664-474d-4a16-90e5-7c789576c2cd
+# ╠═╡ disabled = true
+#=╠═╡
 begin 
 
 	# Clear the tracking array if not empty
@@ -205,8 +206,10 @@ begin
 	# Run the optimisation
 	optim_results = Optimization.solve(optimisation_prob, LBFGS(), callback = callback!, maxiters = 100, progress = true)
 end
+  ╠═╡ =#
 
 # ╔═╡ f31fa805-d0f8-4f04-abaf-d17e0483350e
+#=╠═╡
 begin
 
 	# Solve the ODE problem with optimal parameters
@@ -216,17 +219,22 @@ begin
 	scatter(timeframe[12:end], median_rhoa_FA[12:end], label = "Data", lw=2, title = "FA RhoA dynamics in WT cells")
 	plot!(pred_sol, label = "Prediction", lw=2, idxs=3, ylabel = "Fold-change \nnormalised to baseline", xlabel = "Time [s]")
 end
+  ╠═╡ =#
 
 # ╔═╡ 619564f9-fafd-4750-bc5d-95d3c234e4b1
+#=╠═╡
 # Visualise optimisation statistics
 optim_results.original
+  ╠═╡ =#
 
 # ╔═╡ ffbfc081-1ed0-4402-9174-cfbef1bb9fb3
 # Plot the loss value at each iteration
 plot(track_loss, title = "Evolution of the loss value", label = false)
 
 # ╔═╡ 21f8b5e7-056e-4ea6-abc5-d23d7c8bddfe
+#=╠═╡
 plot(pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
+  ╠═╡ =#
 
 # ╔═╡ ceea52cf-7b52-44a1-af60-127c0eb76bde
 begin
@@ -266,7 +274,6 @@ md"""
 	end
 	
 	@equations begin
-		#D(GEF) ~ 0.00124615 * (10 - GEF) * S - 0.069705 * GEF
 		D(GEF) ~ 0.0123462 * S - 0.0700499 * GEF
 		D(GAP) ~ Kon_GAP - (Koff_GAP * GAP)
 		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Vmax_GAP * GAP * Rho / (Km_GAP + Rho)
@@ -343,6 +350,8 @@ KO_callback! = function(parameters, loss)
 end
 
 # ╔═╡ 38a5bd18-9074-4830-b8e0-9e74e1650547
+# ╠═╡ disabled = true
+#=╠═╡
 begin 
 	# Clear the tracking array if not empty
 	if length(KO_track_loss) > 0
@@ -352,8 +361,10 @@ begin
 	# Run the optimisation
 	KO_optim_results = Optimization.solve(KO_optimisation_prob, LBFGS(), callback = KO_callback!, maxiters = 100, progress = true)
 end
+  ╠═╡ =#
 
 # ╔═╡ 9fcdd6d4-5d71-4f4f-809a-09d76e34a09f
+#=╠═╡
 begin
 # Solve the ODE problem with optimal parameters
 	KO_pred_sol = solve(remake(KO_prob, p=KO_optim_results, tspan=(120, 400)), saveat=0.5, dtmax = 0.05)
@@ -362,16 +373,21 @@ begin
 	plot!(KO_pred_sol, label = "Prediction", lw=2, idxs=3)
 
 end
+  ╠═╡ =#
 
 # ╔═╡ 5b4ccf8e-e412-45eb-8823-b8fefdaaf2d9
+#=╠═╡
 KO_optim_results.original
+  ╠═╡ =#
 
 # ╔═╡ e8b4cb6f-8b04-49f1-8423-ab5479bf8e0a
 # Plot the loss value at each iteration
 plot(KO_track_loss, title = "Evolution of the loss value", label = false)
 
 # ╔═╡ 8fda161f-4c5d-44cb-9e78-789495a6d0b1
+#=╠═╡
 plot(KO_pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "Time [s]")
+  ╠═╡ =#
 
 # ╔═╡ f5877b34-cefe-4653-acd1-7ae9344e7d4f
 begin
@@ -468,13 +484,13 @@ end
 # ╟─a7e00912-b724-4ad4-85c7-aa1d740591d8
 # ╟─55b92dd8-c651-48f5-be6d-30eebb723963
 # ╟─9db6fe47-0391-4e7f-84ae-ecf650f9418e
-# ╠═d352c2f2-1dee-429e-ba4e-1e8860c1f987
+# ╟─d352c2f2-1dee-429e-ba4e-1e8860c1f987
 # ╟─eb81d398-90e5-4d4e-bab5-3df9ac5df099
 # ╟─05840396-3ee2-46d1-99aa-dda4c209a39f
 # ╟─bd48010a-96f9-4922-b86e-bacb1d474568
 # ╟─fe29f3cc-2f90-4c33-b70f-d8ba91e950ea
 # ╟─4b34bb5f-1be5-47a1-a2d7-677a86e7503b
-# ╟─b2400664-474d-4a16-90e5-7c789576c2cd
+# ╠═b2400664-474d-4a16-90e5-7c789576c2cd
 # ╟─f31fa805-d0f8-4f04-abaf-d17e0483350e
 # ╟─619564f9-fafd-4750-bc5d-95d3c234e4b1
 # ╟─ffbfc081-1ed0-4402-9174-cfbef1bb9fb3
@@ -482,13 +498,13 @@ end
 # ╟─ceea52cf-7b52-44a1-af60-127c0eb76bde
 # ╟─07cf038c-1032-4851-bdb1-9c17f290062b
 # ╟─91954a15-bf7c-40cf-a485-1db4bcae08cc
-# ╠═a41bffdf-5564-4e08-a99f-d1de48985584
+# ╟─a41bffdf-5564-4e08-a99f-d1de48985584
 # ╠═1e9a10aa-f14d-4b35-b295-99198d9b835d
 # ╟─51218007-1366-4efc-be76-8596f1a6384c
 # ╟─ef4cc0e0-6473-4a87-9f87-8f3c9a65e57f
 # ╟─d0af947c-168f-4ea1-aac9-b0117277b1aa
 # ╟─0a3ec77c-36f7-4571-b9bc-7f64c45c393c
-# ╟─38a5bd18-9074-4830-b8e0-9e74e1650547
+# ╠═38a5bd18-9074-4830-b8e0-9e74e1650547
 # ╟─9fcdd6d4-5d71-4f4f-809a-09d76e34a09f
 # ╠═5b4ccf8e-e412-45eb-8823-b8fefdaaf2d9
 # ╟─e8b4cb6f-8b04-49f1-8423-ab5479bf8e0a
