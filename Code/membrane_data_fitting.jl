@@ -72,8 +72,8 @@ md"""
 # Import data saved in txt files (Python preprocessing pickle file)
 begin
 	path_to_data = "../Data/"
-	median_rhoa_NONFA = readdlm(Base.Filesystem.joinpath(path_to_data, "median_rhoa_NONFA_dynamics.txt"), ' ', Float64, '\n')[:, 2]
-	median_rhoa_NONFA_KO = readdlm(Base.Filesystem.joinpath(path_to_data, "median_rhoa_NONFA_KO_dynamics.txt"), ' ', Float64, '\n')[:, 2]
+	median_rhoa_NONFA = readdlm(Base.Filesystem.joinpath(path_to_data, "median_rhoa_NONFA_dynamics.txt"), ' ', Float64, '\n')[:, 2] - repeat([1], 40)
+	median_rhoa_NONFA_KO = readdlm(Base.Filesystem.joinpath(path_to_data, "median_rhoa_NONFA_KO_dynamics.txt"), ' ', Float64, '\n')[:, 2] - repeat([1], 40)
 	timeframe = LinRange(0, 390, 40)
 end
 
@@ -101,11 +101,11 @@ md"""
 	@parameters begin
 		Vmax_Rho
 		Km_Rho
-		Vmax_GAP
-		Km_GAP
+		Koff_GAP
 		Vmax_GEF
 		Km_GEF
-		Koff_Rho
+		Vmax_GAP
+		Km_GAP
 	end
 	
 	@variables begin
@@ -116,9 +116,10 @@ md"""
 	end
 
 	@equations begin
-		D(GEF) ~ 0.00124615 * (10 - GEF) * S - 0.069705 * GEF
-		D(GAP) ~ Vmax_Rho * (Rho - 1) / (Km_Rho + Rho - 1) - (Vmax_GAP * GAP) / (Km_GAP + GAP)
-		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Koff_Rho * GAP * (Rho - 1) 
+		#D(GEF) ~ 0.00124615 * (10 - GEF) * S - 0.069705 * GEF
+		D(GEF) ~ 0.0123462 * S - 0.0700499 * GEF
+		D(GAP) ~ Vmax_Rho * Rho / (Km_Rho + Rho) - (Koff_GAP * GAP)
+		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Vmax_GAP * GAP * Rho / (Km_GAP + Rho)
 		S ~ signal_tanh(t)
 	end
 end
@@ -135,7 +136,7 @@ begin
 	# Build ODE problems with guess parameters and initial conditions
 	prob = ODEProblem(model, 
 		[model.GEF => 0, 
-			model.Rho => 1,
+			model.Rho => 0,
 			model.GAP => 0], 
 		(140.0, 390.0), parameter_guess, jac = true)
 end
@@ -170,8 +171,8 @@ begin
 	track_loss = []
 
 	# Define upper and lower bound for parameters and initial conditions
-	lower_b = repeat([0.000001], 7)
-	upper_b = repeat([10], 7)
+	lower_b = repeat([0.0000001], 7)
+	upper_b = repeat([100], 7)
 	
 	# Define the optimisation problem
 	optimisation_prob = Optimization.OptimizationProblem(optimisation_f, parameter_guess, lb = lower_b, ub = upper_b)
@@ -228,7 +229,7 @@ end
 # ╔═╡ 4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
 begin
 	# Save best parameters
-	saved_p = [0.836705, 6.68915, 0.00443433, 1.54632, 0.459101, 0.0282346, 0.00737117]
+	saved_p = [91.4388, 26.955, 0.00436963, 82.7349, 26.955, 0.0308515, 0.0073809]
 	
 	# Solve the ODE with the best parameters and plot
 	saved_pred_sol = solve(remake(prob, p=saved_p, tspan=(120, 400)), saveat=1, dtmax=0.05) 
@@ -247,11 +248,11 @@ md"""
 	
 	@parameters begin
 		Kon_GAP
-		Vmax_GAP
-		Km_GAP
+		Koff_GAP
 		Vmax_GEF
 		Km_GEF
-		Koff_Rho
+		Vmax_GAP
+		Km_GAP
 	end
 	
 	@variables begin
@@ -262,9 +263,10 @@ md"""
 	end
 	
 	@equations begin
-		D(GEF) ~ 0.00124615 * (10 - GEF) * S - 0.069705 * GEF
-		D(GAP) ~ Kon_GAP - (Vmax_GAP * GAP) / (Km_GAP + GAP)
-		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Koff_Rho * GAP * (Rho - 1) * ((tanh(100*(Rho-1))-tanh(100*(Rho-2)))/2)
+		#D(GEF) ~ 0.00124615 * (10 - GEF) * S - 0.069705 * GEF
+		D(GEF) ~ 0.0123462 * S - 0.0700499 * GEF
+		D(GAP) ~ Kon_GAP - (Koff_GAP * GAP)
+		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Vmax_GAP * GAP * Rho / (Km_GAP + Rho)
 		S ~ signal_tanh(t)
 	end
 end
@@ -281,7 +283,7 @@ begin
 	# Build ODE problems with guess parameters and initial conditions
 	KO_prob = ODEProblem(KO_model, 
 		[KO_model.GEF => 0., 
-			KO_model.Rho => 1., 
+			KO_model.Rho => 0., 
 			KO_model.GAP => 0.], 
 		(140.0, 390.0), KO_parameter_guess, jac = true)
 end
@@ -317,8 +319,8 @@ begin
 	KO_track_loss = []
 
 	# Define upper and lower bound for parameters and initial conditions
-	KO_lower_b = repeat([0.000001], 6)
-	KO_upper_b = repeat([10], 6)
+	KO_lower_b = repeat([0.0000001], 6)
+	KO_upper_b = repeat([100], 6)
 	
 	# Define the optimisation problem
 	KO_optimisation_prob = Optimization.OptimizationProblem(KO_optimisation_f, KO_parameter_guess, ub = KO_upper_b, lb = KO_lower_b)
@@ -369,8 +371,8 @@ end
 # ╔═╡ d758e312-70d8-41e3-a1dc-cc6ce8a744db
 begin
 	# Save best parameters
-	saved_KO_p = [1.0005, 6.59163, 0.0472755, 0.997258, 0.442835, 0.0144685]
-
+	saved_KO_p = [62.7661, 15.7041, 0.0467301, 55.1075, 15.7042, 0.0143067]
+	
 	# Solve the ODE with the best parameters and plot
 	saved_KO_pred_sol = solve(remake(KO_prob, p=saved_KO_p, tspan=(120, 400)), saveat=1, dtmax=0.05) 
 	scatter(timeframe[12:end], median_rhoa_NONFA_KO[12:end], label = "Data", lw=2, title = "Membrane RhoA dynamics in DLC1-KO cells")
@@ -429,11 +431,11 @@ begin
 	symbolic_p = [
 		model.Vmax_Rho => saved_p[get_idxparam(model.Vmax_Rho, prob)],
 		model.Km_Rho => saved_p[get_idxparam(model.Km_Rho, prob)],
-		model.Vmax_GAP => saved_p[get_idxparam(model.Vmax_GAP, prob)],
-		model.Km_GAP => saved_p[get_idxparam(model.Km_GAP, prob)],
+		model.Koff_GAP => saved_p[get_idxparam(model.Koff_GAP, prob)],
 		model.Vmax_GEF => saved_p[get_idxparam(model.Vmax_GEF, prob)],
 		model.Km_GEF => saved_p[get_idxparam(model.Km_GEF, prob)],
-		model.Koff_Rho => saved_p[get_idxparam(model.Koff_Rho, prob)]
+		model.Vmax_GAP => saved_p[get_idxparam(model.Vmax_GAP, prob)],
+		model.Km_GAP => saved_p[get_idxparam(model.Km_GAP, prob)]
 	]
 end
 
@@ -442,11 +444,11 @@ begin
 	# Transform back ODE parameters to their symbolic expression
 	symbolic_KO_p = [
 		KO_model.Kon_GAP => saved_KO_p[get_idxparam(KO_model.Kon_GAP, KO_prob)],
-		KO_model.Vmax_GAP => saved_KO_p[get_idxparam(KO_model.Vmax_GAP, KO_prob)],
-		KO_model.Km_GAP => saved_KO_p[get_idxparam(KO_model.Km_GAP, KO_prob)],
+		KO_model.Koff_GAP => saved_KO_p[get_idxparam(KO_model.Koff_GAP, KO_prob)],
 		KO_model.Vmax_GEF => saved_KO_p[get_idxparam(KO_model.Vmax_GEF, KO_prob)], 
 		KO_model.Km_GEF => saved_KO_p[get_idxparam(KO_model.Km_GEF, KO_prob)],
-		KO_model.Koff_Rho => saved_KO_p[get_idxparam(KO_model.Koff_Rho, KO_prob)]
+		KO_model.Vmax_GAP => saved_KO_p[get_idxparam(KO_model.Vmax_GAP, KO_prob)],
+		KO_model.Km_GAP => saved_KO_p[get_idxparam(KO_model.Km_GAP, KO_prob)],
 	]
 end
 
@@ -462,7 +464,7 @@ end
 # ╟─54de911c-3eb3-46b9-82cd-3bc43eb5c9d6
 # ╟─487b4ff4-3e29-48d0-bb6d-9d9ec048de1c
 # ╟─f025a699-1e30-478c-8160-4ea16005eac7
-# ╠═c654e848-5777-4443-87b4-58e48b353f01
+# ╟─c654e848-5777-4443-87b4-58e48b353f01
 # ╟─f6eef16c-6084-42ee-80ea-fc4165b78753
 # ╟─979b822d-cbc4-49b5-b2d4-8821fc664917
 # ╟─3fae1a20-4231-4758-a403-11e929d36a10
@@ -471,7 +473,7 @@ end
 # ╟─e4389a99-b2e8-4938-843d-343f9dd3df5f
 # ╟─16fc1498-503b-4447-9ea9-82879efdf3f8
 # ╟─476286e8-dd0d-4036-b3ab-e9f075ce8205
-# ╠═2efefa13-fad1-4ad1-8265-32cf46ffddbb
+# ╟─2efefa13-fad1-4ad1-8265-32cf46ffddbb
 # ╟─fab82aa4-a281-4bb9-8771-378cef7bf613
 # ╟─4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
 # ╟─50000f94-3949-4f4d-911d-019c4d1a3115
@@ -483,7 +485,7 @@ end
 # ╟─764df649-41df-417e-bfc9-19376333550d
 # ╟─1148d27b-d16a-41c7-9795-81331f1d32f0
 # ╟─13c1ea9b-9804-4f9c-8429-6c024284bf8e
-# ╠═c6bfd2a4-df9d-4f83-882d-d1bb1c1a3ecb
+# ╟─c6bfd2a4-df9d-4f83-882d-d1bb1c1a3ecb
 # ╟─09cce5a5-713d-445c-aadf-34f9a820be56
 # ╟─ea8d3c39-e086-4db0-b50f-f1b64bc992cf
 # ╟─d758e312-70d8-41e3-a1dc-cc6ce8a744db
