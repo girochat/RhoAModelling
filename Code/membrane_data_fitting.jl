@@ -71,7 +71,7 @@ md"""
 # ╔═╡ a20dcc69-c419-472d-8b93-836cde4a54e7
 # Import data saved in txt files (Python preprocessing pickle file)
 begin
-	path_to_data = "../Data/"
+	path_to_data = "../Data/corrected_version"
 	median_rhoa_NONFA = readdlm(Base.Filesystem.joinpath(path_to_data, "median_rhoa_NONFA_dynamics.txt"), ' ', Float64, '\n')[:, 2] - repeat([1], 40)
 	median_rhoa_NONFA_KO = readdlm(Base.Filesystem.joinpath(path_to_data, "median_rhoa_NONFA_KO_dynamics.txt"), ' ', Float64, '\n')[:, 2] - repeat([1], 40)
 	timeframe = LinRange(0, 390, 40)
@@ -191,8 +191,6 @@ callback! = function(parameters, loss)
 end
 
 # ╔═╡ e4389a99-b2e8-4938-843d-343f9dd3df5f
-# ╠═╡ disabled = true
-#=╠═╡
 begin 
 
 	# Clear the tracking arrays if not empty
@@ -203,7 +201,6 @@ begin
 	# Run the optimisation
 	optim_results = Optimization.solve(optimisation_prob, LBFGS(), callback = callback!, maxiters = 100, progress = true)
 end
-  ╠═╡ =#
 
 # ╔═╡ 16fc1498-503b-4447-9ea9-82879efdf3f8
 #=╠═╡
@@ -237,7 +234,7 @@ end
 # ╔═╡ 4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
 begin
 	# Save best parameters
-	saved_p = [91.4388, 26.955, 0.00436963, 82.7349, 26.955, 0.0308515, 0.0073809]
+	saved_p = [0.231596, 21.7571, 0.0115635, 84.7543, 0.343038, 0.229844, 0.00620184]
 	
 	# Solve the ODE with the best parameters and plot
 	saved_pred_sol = solve(remake(prob, p=saved_p, tspan=(120, 400)), saveat=1, dtmax=0.05) 
@@ -327,7 +324,7 @@ begin
 
 	# Define upper and lower bound for parameters and initial conditions
 	KO_lower_b = repeat([0.0000001], 6)
-	KO_upper_b = repeat([100], 6)
+	KO_upper_b = repeat([99.999999], 6)
 	
 	# Define the optimisation problem
 	KO_optimisation_prob = Optimization.OptimizationProblem(KO_optimisation_f, KO_parameter_guess, ub = KO_upper_b, lb = KO_lower_b)
@@ -387,7 +384,7 @@ end
 # ╔═╡ d758e312-70d8-41e3-a1dc-cc6ce8a744db
 begin
 	# Save best parameters
-	saved_KO_p = [62.7661, 15.7041, 0.0467301, 55.1075, 15.7042, 0.0143067]
+	saved_KO_p = [98.7984, 26.0503, 0.0316758, 96.8718, 26.0503, 0.00997048]
 	
 	# Solve the ODE with the best parameters and plot
 	saved_KO_pred_sol = solve(remake(KO_prob, p=saved_KO_p, tspan=(120, 400)), saveat=1, dtmax=0.05) 
@@ -476,22 +473,22 @@ end
 # ╟─52bdbc46-53fc-42ca-8fec-e43522c30063
 # ╟─247533da-69ba-483c-8025-004c32a1bf9c
 # ╟─b05d3803-9883-4073-87a8-6324db7c207f
-# ╟─a20dcc69-c419-472d-8b93-836cde4a54e7
+# ╠═a20dcc69-c419-472d-8b93-836cde4a54e7
 # ╟─54de911c-3eb3-46b9-82cd-3bc43eb5c9d6
 # ╟─487b4ff4-3e29-48d0-bb6d-9d9ec048de1c
 # ╟─f025a699-1e30-478c-8160-4ea16005eac7
-# ╟─c654e848-5777-4443-87b4-58e48b353f01
-# ╟─f6eef16c-6084-42ee-80ea-fc4165b78753
-# ╟─979b822d-cbc4-49b5-b2d4-8821fc664917
+# ╠═c654e848-5777-4443-87b4-58e48b353f01
+# ╠═f6eef16c-6084-42ee-80ea-fc4165b78753
+# ╠═979b822d-cbc4-49b5-b2d4-8821fc664917
 # ╟─3fae1a20-4231-4758-a403-11e929d36a10
 # ╟─4640701b-a251-46f0-b94c-b345b46e8ab1
-# ╟─5d479288-888c-4a32-8215-e5cf6b0713ca
+# ╠═5d479288-888c-4a32-8215-e5cf6b0713ca
 # ╠═e4389a99-b2e8-4938-843d-343f9dd3df5f
-# ╟─16fc1498-503b-4447-9ea9-82879efdf3f8
-# ╟─476286e8-dd0d-4036-b3ab-e9f075ce8205
-# ╟─2efefa13-fad1-4ad1-8265-32cf46ffddbb
+# ╠═16fc1498-503b-4447-9ea9-82879efdf3f8
+# ╠═476286e8-dd0d-4036-b3ab-e9f075ce8205
+# ╠═2efefa13-fad1-4ad1-8265-32cf46ffddbb
 # ╟─fab82aa4-a281-4bb9-8771-378cef7bf613
-# ╟─4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
+# ╠═4d6ab3c4-d077-4451-a96b-6d8d7c8e1beb
 # ╟─50000f94-3949-4f4d-911d-019c4d1a3115
 # ╟─5948c768-4b3c-4bb2-b880-6723fafc9053
 # ╟─df9db3fd-2e86-496a-afc5-f27887cdda12
@@ -499,12 +496,12 @@ end
 # ╟─fe32650c-3795-4c93-a04c-a3828241f85e
 # ╟─89b95eca-fef6-43b9-bacc-401aabf075d4
 # ╟─764df649-41df-417e-bfc9-19376333550d
-# ╟─1148d27b-d16a-41c7-9795-81331f1d32f0
+# ╠═1148d27b-d16a-41c7-9795-81331f1d32f0
 # ╠═13c1ea9b-9804-4f9c-8429-6c024284bf8e
-# ╟─c6bfd2a4-df9d-4f83-882d-d1bb1c1a3ecb
-# ╟─09cce5a5-713d-445c-aadf-34f9a820be56
-# ╟─ea8d3c39-e086-4db0-b50f-f1b64bc992cf
-# ╟─d758e312-70d8-41e3-a1dc-cc6ce8a744db
+# ╠═c6bfd2a4-df9d-4f83-882d-d1bb1c1a3ecb
+# ╠═09cce5a5-713d-445c-aadf-34f9a820be56
+# ╠═ea8d3c39-e086-4db0-b50f-f1b64bc992cf
+# ╠═d758e312-70d8-41e3-a1dc-cc6ce8a744db
 # ╟─ee1b032c-e614-4251-90a7-4f50da3b61d1
 # ╟─0763ed96-04bb-43b3-8c40-fa58344ea96f
 # ╟─33ec1636-17f6-4e89-a42f-e368df94b965

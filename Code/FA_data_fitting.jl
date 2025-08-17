@@ -72,7 +72,7 @@ md"""
 # ╔═╡ cd315a91-fd2c-4b93-a643-72c041b711d6
 # Import data saved in txt files (Python preprocessing pickle file)
 begin
-	path_to_data = "../Data/"
+	path_to_data = "../Data/corrected_version"
 	median_rhoa_FA = readdlm(Base.Filesystem.joinpath(path_to_data, "median_rhoa_FA_dynamics.txt"), ' ', Float64, '\n')[:, 2] - repeat([1], 40)
 	median_rhoa_FA_KO = readdlm(Base.Filesystem.joinpath(path_to_data, "median_rhoa_FA_KO_dynamics.txt"), ' ', Float64, '\n')[:, 2] - repeat([1], 40)
 	timeframe = LinRange(0, 390, 40)
@@ -174,7 +174,7 @@ begin
 
 	# Set upper and lower bound for the parameters and initial conditions
 	lower_b = repeat([0.0000001], 7)
-	upper_b = repeat([100], 7)
+	upper_b = repeat([99.999999], 7)
 
 	# Define the optimisation problem
 	optimisation_prob = Optimization.OptimizationProblem(optimisation_f, parameter_guess, lb = lower_b, ub=upper_b)
@@ -239,7 +239,7 @@ plot(pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel = "T
 # ╔═╡ ceea52cf-7b52-44a1-af60-127c0eb76bde
 begin
 	# Save best parameters
-	saved_p = [99.9917, 29.0749, 0.00649342, 95.5157, 29.0749, 0.143267, 0.00516738]
+	saved_p = [78.2643, 26.0664, 0.0108754, 85.8913, 30.2592, 0.205928, 0.00457141]
 
 	# Solve the ODE with the best parameters and plot
 	saved_pred_sol = solve(remake(prob, p=saved_p, tspan=(120, 400)), saveat=1, dtmax=0.05) 
@@ -276,7 +276,7 @@ md"""
 	@equations begin
 		D(GEF) ~ 0.0123462 * S - 0.0700499 * GEF
 		D(GAP) ~ Kon_GAP - (Koff_GAP * GAP)
-		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Vmax_GAP * GAP * Rho / (Km_GAP + Rho)
+		D(Rho) ~ Vmax_GEF * GEF / (Km_GEF + GEF) - Vmax_GAP * Rho * GAP / (Km_GAP + Rho)
 		S ~ signal_tanh(t)
 	end
 end
@@ -331,7 +331,7 @@ begin
 
 	# Set upper and lower bound for the parameters and initial conditions
 	KO_lower_b = repeat([0.0000001], 6)
-	KO_upper_b = repeat([100], 6)
+	KO_upper_b = repeat([99.999999], 6)
 
 	# Define the optimisation problem
 	KO_optimisation_prob = Optimization.OptimizationProblem(KO_optimisation_f, KO_parameter_guess, lb= KO_lower_b, ub=KO_upper_b)
@@ -392,7 +392,7 @@ plot(KO_pred_sol, title = "aGEF, aGAP and aRhoA simultaneous dynamics", xlabel =
 # ╔═╡ f5877b34-cefe-4653-acd1-7ae9344e7d4f
 begin
 	# Save best parameters
-	saved_KO_p = [99.9436, 20.6164, 0.0360187, 85.836, 20.6164, 0.0102664]
+	saved_KO_p = [90.7943, 15.6667, 0.038268, 64.4659, 15.6662, 0.00759615]
 
 	# Solve the ODE with the best parameters and plot
 	saved_KO_pred_sol = solve(remake(KO_prob, p=saved_KO_p, tspan=(120, 400)), saveat=1, dtmax=0.05) 
@@ -480,8 +480,8 @@ end
 # ╟─52bdbc46-53fc-42ca-8fec-e43522c30063
 # ╟─247533da-69ba-483c-8025-004c32a1bf9c
 # ╟─4b16437a-accf-4895-9b54-99736a75bd83
-# ╟─cd315a91-fd2c-4b93-a643-72c041b711d6
-# ╟─a7e00912-b724-4ad4-85c7-aa1d740591d8
+# ╠═cd315a91-fd2c-4b93-a643-72c041b711d6
+# ╠═a7e00912-b724-4ad4-85c7-aa1d740591d8
 # ╟─55b92dd8-c651-48f5-be6d-30eebb723963
 # ╟─9db6fe47-0391-4e7f-84ae-ecf650f9418e
 # ╟─d352c2f2-1dee-429e-ba4e-1e8860c1f987
@@ -489,27 +489,27 @@ end
 # ╟─05840396-3ee2-46d1-99aa-dda4c209a39f
 # ╟─bd48010a-96f9-4922-b86e-bacb1d474568
 # ╟─fe29f3cc-2f90-4c33-b70f-d8ba91e950ea
-# ╟─4b34bb5f-1be5-47a1-a2d7-677a86e7503b
+# ╠═4b34bb5f-1be5-47a1-a2d7-677a86e7503b
 # ╠═b2400664-474d-4a16-90e5-7c789576c2cd
-# ╟─f31fa805-d0f8-4f04-abaf-d17e0483350e
-# ╟─619564f9-fafd-4750-bc5d-95d3c234e4b1
+# ╠═f31fa805-d0f8-4f04-abaf-d17e0483350e
+# ╠═619564f9-fafd-4750-bc5d-95d3c234e4b1
 # ╟─ffbfc081-1ed0-4402-9174-cfbef1bb9fb3
 # ╟─21f8b5e7-056e-4ea6-abc5-d23d7c8bddfe
-# ╟─ceea52cf-7b52-44a1-af60-127c0eb76bde
+# ╠═ceea52cf-7b52-44a1-af60-127c0eb76bde
 # ╟─07cf038c-1032-4851-bdb1-9c17f290062b
 # ╟─91954a15-bf7c-40cf-a485-1db4bcae08cc
-# ╟─a41bffdf-5564-4e08-a99f-d1de48985584
+# ╠═a41bffdf-5564-4e08-a99f-d1de48985584
 # ╠═1e9a10aa-f14d-4b35-b295-99198d9b835d
-# ╟─51218007-1366-4efc-be76-8596f1a6384c
+# ╠═51218007-1366-4efc-be76-8596f1a6384c
 # ╟─ef4cc0e0-6473-4a87-9f87-8f3c9a65e57f
 # ╟─d0af947c-168f-4ea1-aac9-b0117277b1aa
-# ╟─0a3ec77c-36f7-4571-b9bc-7f64c45c393c
+# ╠═0a3ec77c-36f7-4571-b9bc-7f64c45c393c
 # ╠═38a5bd18-9074-4830-b8e0-9e74e1650547
-# ╟─9fcdd6d4-5d71-4f4f-809a-09d76e34a09f
+# ╠═9fcdd6d4-5d71-4f4f-809a-09d76e34a09f
 # ╠═5b4ccf8e-e412-45eb-8823-b8fefdaaf2d9
 # ╟─e8b4cb6f-8b04-49f1-8423-ab5479bf8e0a
 # ╟─8fda161f-4c5d-44cb-9e78-789495a6d0b1
-# ╟─f5877b34-cefe-4653-acd1-7ae9344e7d4f
+# ╠═f5877b34-cefe-4653-acd1-7ae9344e7d4f
 # ╟─837c314e-ea7b-4dab-8240-13da3a17d6e5
 # ╟─af2bb913-c1a6-489f-b5ae-3cece876e089
 # ╟─a4b2fb33-2b1c-4a8b-a8a7-69cedade9a6a
